@@ -17,21 +17,85 @@ public class Main {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
 
-    // Helper function to compare points based on their x-coordinates
-    static class XComparator implements Comparator<Point> {
-        public int compare(Point p1, Point p2) {
-            return Integer.compare(p1.x, p2.x);
+    // Merge sort for sorting points based on x-coordinate
+    public static void mergeSortByX(Point[] points, int low, int high) {
+        if (low < high) {
+            int mid = (low + high) / 2;
+            mergeSortByX(points, low, mid);
+            mergeSortByX(points, mid + 1, high);
+            mergeByX(points, low, mid, high);
         }
     }
 
-    // Helper function to compare points based on their y-coordinates
-    static class YComparator implements Comparator<Point> {
-        public int compare(Point p1, Point p2) {
-            return Integer.compare(p1.y, p2.y);
+    // Merge function for merge sort (based on x-coordinate)
+    public static void mergeByX(Point[] points, int low, int mid, int high) {
+        int n1 = mid - low + 1;
+        int n2 = high - mid;
+
+        Point[] left = new Point[n1];
+        Point[] right = new Point[n2];
+
+        System.arraycopy(points, low, left, 0, n1);
+        System.arraycopy(points, mid + 1, right, 0, n2);
+
+        int i = 0, j = 0, k = low;
+        while (i < n1 && j < n2) {
+            if (left[i].x <= right[j].x) {
+                points[k++] = left[i++];
+            } else {
+                points[k++] = right[j++];
+            }
+        }
+
+        while (i < n1) {
+            points[k++] = left[i++];
+        }
+
+        while (j < n2) {
+            points[k++] = right[j++];
         }
     }
 
-    // Function to find the closest pair of pointsX using divide and conquer
+    // Merge sort for sorting points based on y-coordinate
+    public static void mergeSortByY(Point[] points, int low, int high) {
+        if (low < high) {
+            int mid = (low + high) / 2;
+            mergeSortByY(points, low, mid);
+            mergeSortByY(points, mid + 1, high);
+            mergeByY(points, low, mid, high);
+        }
+    }
+
+    // Merge function for merge sort (based on y-coordinate)
+    public static void mergeByY(Point[] points, int low, int mid, int high) {
+        int n1 = mid - low + 1;
+        int n2 = high - mid;
+
+        Point[] left = new Point[n1];
+        Point[] right = new Point[n2];
+
+        System.arraycopy(points, low, left, 0, n1);
+        System.arraycopy(points, mid + 1, right, 0, n2);
+
+        int i = 0, j = 0, k = low;
+        while (i < n1 && j < n2) {
+            if (left[i].y <= right[j].y) {
+                points[k++] = left[i++];
+            } else {
+                points[k++] = right[j++];
+            }
+        }
+
+        while (i < n1) {
+            points[k++] = left[i++];
+        }
+
+        while (j < n2) {
+            points[k++] = right[j++];
+        }
+    }
+
+    // Function to find the closest pair of points using divide and conquer
     public static double closestPair(Point[] pointsX, Point[] pointsY) {
         int n = pointsX.length;
 
@@ -81,13 +145,13 @@ public class Main {
                 new Point(3, 4)
         };
 
-        // Sort points by x-coordinate
+        // Sort points by x-coordinate using merge sort
         Point[] pointsX = Arrays.copyOf(points, points.length);
-        Arrays.sort(pointsX, new XComparator());
+        mergeSortByX(pointsX, 0, pointsX.length - 1);
 
-        // Sort points by y-coordinate
+        // Sort points by y-coordinate using merge sort
         Point[] pointsY = Arrays.copyOf(points, points.length);
-        Arrays.sort(pointsY, new YComparator());
+        mergeSortByY(pointsY, 0, pointsY.length - 1);
 
         // Find the closest pair of points
         double closestDist = closestPair(pointsX, pointsY);
