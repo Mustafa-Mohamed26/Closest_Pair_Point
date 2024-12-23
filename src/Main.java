@@ -17,80 +17,56 @@ public class Main {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
 
-    // Merge sort for sorting points based on x-coordinate
-    public static void mergeSortByX(Point[] points, int low, int high) {
-        if (low < high) {
-            int mid = (low + high) / 2;
-            mergeSortByX(points, low, mid);
-            mergeSortByX(points, mid + 1, high);
-            mergeByX(points, low, mid, high);
+    public static void mergeSort(Point[] points, int n, boolean sortByX) {
+        if (n < 2) {
+            return;
         }
+        int mid = n / 2;
+        Point[] left = new Point[mid];
+        Point[] right = new Point[n - mid];
+
+        // Splitting the array into two halves
+        for (int i = 0; i < mid; i++) {
+            left[i] = points[i];
+        }
+        for (int i = mid; i < n; i++) {
+            right[i - mid] = points[i];
+        }
+
+        // Recursively sorting both halves
+        mergeSort(left, mid, sortByX);
+        mergeSort(right, n - mid, sortByX);
+
+        // Merging the sorted halves
+        merge(points, left, right, mid, n - mid, sortByX);
     }
 
-    // Merge function for merge sort (based on x-coordinate)
-    public static void mergeByX(Point[] points, int low, int mid, int high) {
-        int n1 = mid - low + 1;
-        int n2 = high - mid;
+    public static void merge(Point[] points, Point[] left, Point[] right, int leftSize, int rightSize, boolean sortByX) {
+        int i = 0, j = 0, k = 0;
 
-        Point[] left = new Point[n1];
-        Point[] right = new Point[n2];
-
-        System.arraycopy(points, low, left, 0, n1);
-        System.arraycopy(points, mid + 1, right, 0, n2);
-
-        int i = 0, j = 0, k = low;
-        while (i < n1 && j < n2) {
-            if (left[i].x <= right[j].x) {
-                points[k++] = left[i++];
+        while (i < leftSize && j < rightSize) {
+            if (sortByX) {
+                // Sort by x coordinate
+                if (left[i].x < right[j].x || (left[i].x == right[j].x && left[i].y <= right[j].y)) {
+                    points[k++] = left[i++];
+                } else {
+                    points[k++] = right[j++];
+                }
             } else {
-                points[k++] = right[j++];
+                // Sort by y coordinate
+                if (left[i].y < right[j].y || (left[i].y == right[j].y && left[i].x <= right[j].x)) {
+                    points[k++] = left[i++];
+                } else {
+                    points[k++] = right[j++];
+                }
             }
         }
 
-        while (i < n1) {
+        // Copy remaining elements
+        while (i < leftSize) {
             points[k++] = left[i++];
         }
-
-        while (j < n2) {
-            points[k++] = right[j++];
-        }
-    }
-
-    // Merge sort for sorting points based on y-coordinate
-    public static void mergeSortByY(Point[] points, int low, int high) {
-        if (low < high) {
-            int mid = (low + high) / 2;
-            mergeSortByY(points, low, mid);
-            mergeSortByY(points, mid + 1, high);
-            mergeByY(points, low, mid, high);
-        }
-    }
-
-    // Merge function for merge sort (based on y-coordinate)
-    public static void mergeByY(Point[] points, int low, int mid, int high) {
-        int n1 = mid - low + 1;
-        int n2 = high - mid;
-
-        Point[] left = new Point[n1];
-        Point[] right = new Point[n2];
-
-        System.arraycopy(points, low, left, 0, n1);
-        System.arraycopy(points, mid + 1, right, 0, n2);
-
-        int i = 0, j = 0, k = low;
-        while (i < n1 && j < n2) {
-            if (left[i].y <= right[j].y) {
-                points[k++] = left[i++];
-            } else {
-                points[k++] = right[j++];
-            }
-        }
-
-        while (i < n1) {
-            points[k++] = left[i++];
-        }
-
-        while (j < n2) {
+        while (j < rightSize) {
             points[k++] = right[j++];
         }
     }
@@ -147,11 +123,11 @@ public class Main {
 
         // Sort points by x-coordinate using merge sort
         Point[] pointsX = Arrays.copyOf(points, points.length);
-        mergeSortByX(pointsX, 0, pointsX.length - 1);
+        mergeSort(pointsX, points.length, true);
 
         // Sort points by y-coordinate using merge sort
         Point[] pointsY = Arrays.copyOf(points, points.length);
-        mergeSortByY(pointsY, 0, pointsY.length - 1);
+        mergeSort(pointsY, points.length, false);
 
         // Find the closest pair of points
         double closestDist = closestPair(pointsX, pointsY);
